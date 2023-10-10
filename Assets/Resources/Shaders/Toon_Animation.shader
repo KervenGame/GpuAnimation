@@ -1,4 +1,6 @@
-﻿Shader "Toon/Animation" {
+﻿// Upgrade NOTE: upgraded instancing buffer 'Props' to new syntax.
+
+Shader "Toon/Animation" {
 	Properties{
 		_MainTex("MainTex",2D)="white"{}
 		_SkinningTex("SkinningTex",2D)="black"{}
@@ -22,9 +24,10 @@
 			uniform sampler2D _SkinningTex;
 			uniform float _SkinningTexSize;
 
-			UNITY_INSTANCING_CBUFFER_START(Props)
+			UNITY_INSTANCING_BUFFER_START(Props)
 				UNITY_DEFINE_INSTANCED_PROP(float,_StartPixelIndex)
-			UNITY_INSTANCING_CBUFFER_END
+#define _StartPixelIndex_arr Props
+			UNITY_INSTANCING_BUFFER_END(Props)
 
 			inline float4 getUV(float startIndex){
 				float y=(int)(startIndex/_SkinningTexSize);
@@ -58,7 +61,7 @@
 			VertexOutput vert(VertexInput input){
 				VertexOutput output;
 				UNITY_SETUP_INSTANCE_ID(input);
-				float startPixelIndex=UNITY_ACCESS_INSTANCED_PROP(_StartPixelIndex);
+				float startPixelIndex=UNITY_ACCESS_INSTANCED_PROP(_StartPixelIndex_arr, _StartPixelIndex);
 				float4 index=input.uv1;
 				float4 weight=input.uv2;
 				float4x4 matrix1=getMatrix(startPixelIndex+index.x*3);
